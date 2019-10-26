@@ -1,7 +1,6 @@
 from room import Room
 from player import Player
 from world import World
-from queue import Queue
 
 import random
 
@@ -22,92 +21,7 @@ player = Player("Name", world.startingRoom)
 
 
 # FILL THIS IN
-traversalPath = []
-graph = {0: {"n": "?", "e": "?", "s": "?", "w": "?"}}
-inverse_directions = {'n': 's', 's': 'n', 'e': 'w', 'w': 'e'}
-
-def back_to_unexplored(room_id):
-    q = Queue()
-    q.put([room_id])
-    visited = set()
-    while not q.empty():
-        path = q.get()
-        previous_room = path[-1]  # looking at last item which is your current room id
-        if previous_room not in visited:
-            for exit in graph[previous_room]:
-                if graph[previous_room][exit] == '?':
-                    return path
-            visited.add(previous_room)
-            for exit_direction in graph[previous_room]:
-                new_path = path[:]
-                # appends room number
-                new_path.append(graph[previous_room][exit_direction])
-                q.put(new_path)
-    return None
-
-
-def directions(path):
-    current_room = path[0]
-    directions = []
-    for room in path[1:]:
-        for exit in graph[current_room]:
-            if room == graph[current_room][exit]:
-                directions.append(exit)
-    return directions
-
-
-while True:
-    currentRoomExits = graph[player.currentRoom.id]
-    unExploredExits = []  # all unexplored exits
-
-    for direction in currentRoomExits:
-        if currentRoomExits[direction] == '?':
-            # during the first run, unExploredExits = ['n', 'e', 's', 'w']
-            unExploredExits.append(direction)
-
-    if len(unExploredExits) > 0:
-        firstExit = random.sample(unExploredExits, 1)[0]
-        traversalPath.append(firstExit)
-        prev_room_id = player.currentRoom.id
-
-        player.travel(firstExit)
-
-        exitDict = {}  
-        if player.currentRoom.id not in graph:
-            for exit in player.currentRoom.getExits():
-                # set every exit in getExits as the key to with '?'
-                exitDict[exit] = '?'
-            graph[player.currentRoom.id] = exitDict
-
-        # graph[0]['n'] = '?' --> 1
-        # previous {room 0: {'n': 1, 'e': '?', 's': 0, 'w': '?'}}
-        graph[prev_room_id][firstExit] = player.currentRoom.id
-
-        graph[player.currentRoom.id][inverse_directions[firstExit]] = prev_room_id
-    else:
-        path_to_unexplored = back_to_unexplored(player.currentRoom.id)
-        # print(f"path_to_unexplored = {path_to_unexplored}")
-        if path_to_unexplored is None:
-            break
-        for direction in directions(path_to_unexplored):
-            player.travel(direction)  # player walks
-            traversalPath.append(direction)  # directions that player will walk
-
-
-# TRAVERSAL TEST
-visited_rooms = set()
-player.currentRoom = world.startingRoom
-visited_rooms.add(player.currentRoom)
-for move in traversalPath:
-    player.travel(move)
-    visited_rooms.add(player.currentRoom)
-
-if len(visited_rooms) == len(roomGraph):
-    print(
-        f"TESTS PASSED: {len(traversalPath)} moves, {len(visited_rooms)} rooms visited")
-else:
-    print("TESTS FAILED: INCOMPLETE TRAVERSAL")
-    print(f"{len(roomGraph) - len(visited_rooms)} unvisited rooms")
+traversalPath = ['n', 's']
 
 
 # TRAVERSAL TEST
